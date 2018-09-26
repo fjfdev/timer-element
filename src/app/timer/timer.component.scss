@@ -1,0 +1,50 @@
+@font-face {
+  font-family: "Digital";
+  src: url('../../assets/DigitalRegular.ttf') format('truetype');
+}
+
+.timer-container {
+  width: 100%;
+  display: inline-block;
+  
+  @media(max-width: 300px) {
+    text-align: center;
+  }
+
+  .timer-value {
+    float: left;
+    font-family: "Digital";
+    font-size: 40px;
+
+    @media(max-width: 300px) {
+      float: none;
+    }
+  }
+
+  .timer-actions {
+    float: right;
+    margin-top: 11px;
+
+    @media(max-width: 300px) {
+      float: none;
+    }
+
+    button:focus {
+      outline: 0px;
+    }
+
+    button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      width: 40px;
+      z-index: 1;
+
+      object {
+        position: relative;
+        z-index: -1;
+      }
+    }
+
+  }
+}
