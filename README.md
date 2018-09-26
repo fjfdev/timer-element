@@ -1,10 +1,10 @@
-# TimerElement
+# TimerElement :watch:
 
 This is a simple web component built using Angular Elements.
 
 # Dependencies
 
-I have used this tools:
+I have used these tools:
 
 * Angular 6.1.8
 * Angular CLI 6.2.3.
