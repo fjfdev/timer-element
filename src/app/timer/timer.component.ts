@@ -4,11 +4,11 @@ import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
   selector: 'custom-timer',
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss'],
-  encapsulation: ViewEncapsulation.Native
+  encapsulation: ViewEncapsulation.Emulated
 })
 export class TimerComponent implements OnDestroy {
   timerValue: string;
-  timerInterval: number;
+  timerInterval;
   isTimerRunning: boolean;
 
   constructor() {
@@ -25,7 +25,7 @@ export class TimerComponent implements OnDestroy {
     this.timerInterval = setInterval( () => {
       const seconds = secCount % 60;
       const minutes = Math.floor((secCount / 60)) % 60;
-      const hours = Math.floor((secCount / 60) / 60);
+      const hours = Math.floor(Math.floor((secCount / 60)) / 60);
 
       const secondsStr = ('0' + seconds).slice(-2);
       const minutesStr = ('0' + minutes).slice(-2);
