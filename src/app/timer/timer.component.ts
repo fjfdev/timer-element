@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { select as d3Select } from 'd3-selection';
+import * as d3 from 'd3';
 
 @Component({
   selector: 'custom-timer',
@@ -19,7 +19,6 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.resetTimerValues();
-    this.initWidget();
   }
 
   ngOnDestroy() {
@@ -27,6 +26,39 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   initTimer() {
+    const svg = d3.select('#d3-widget')
+      .append('svg')
+      .attr('width', '400')
+      .attr('height', '400');
+
+    const secondsPath = svg
+      .append('path')
+      .attr('transform', 'translate(200,200)');
+
+    const minutesPath = svg
+      .append('path')
+      .attr('transform', 'translate(200,200)');
+
+    const hoursPath = svg
+      .append('path')
+      .attr('transform', 'translate(200,200)');
+
+    const pi = Math.PI;
+    const secSlide = (2 * pi) / 60;
+    let secPosition = secSlide;
+    const secLimit = (2 * pi);
+    let fillColor = 'E91039';
+
+    let secondsArc = this.createArc(100, 130, 0, secPosition, 30);
+    let minutesArc = this.createArc(65, 95, 0, secPosition, 30);
+    let hoursArc = this.createArc(30, 60, 0, secPosition, 30);
+
+    this.drawArc(secondsPath, secondsArc, '#E91039');
+    this.drawArc(minutesPath, minutesArc, '#A0FF00');
+    this.drawArc(hoursPath, hoursArc, '#19D5DE');
+
+
+    //
     let secCount = 1;
     this.isTimerRunning = true;
     this.timerInterval = setInterval( () => {
@@ -40,6 +72,20 @@ export class TimerComponent implements OnInit, OnDestroy {
 
       this.timerValue = `${hoursStr}:${minutesStr}:${secondsStr}`;
       secCount += 1;
+    //
+
+      const resetClockNeeded: boolean = secPosition > secLimit;
+      secPosition = resetClockNeeded ? 0 : secPosition + secSlide;
+      fillColor = resetClockNeeded ? '#000000' : '#E91039';
+
+      secondsArc = this.createArc(100, 130, 0, secSlide * seconds, 30);
+      minutesArc = this.createArc(65, 95, 0, secSlide * minutes, 30);
+      hoursArc = this.createArc(30, 60, 0, secSlide * hours, 30);
+
+      this.drawArc(secondsPath, secondsArc, fillColor);
+      this.drawArc(minutesPath, minutesArc, '#A0FF00');
+      this.drawArc(hoursPath, hoursArc, '#19D5DE');
+
     }, 1000);
   }
 
@@ -53,47 +99,20 @@ export class TimerComponent implements OnInit, OnDestroy {
     clearInterval(this.timerInterval);
   }
 
-  initWidget() {
-    /*const element = d3Select('#seconds-widget');
-    const parentSize = element.node().getBoundingClientRect();
-    console.log(parentSize)*/
-    this.secCanvas = <HTMLCanvasElement> document.getElementById('seconds-widget');
-    this.ctx = this.secCanvas.getContext('2d');
-
-    const xCenter = this.secCanvas.width / 2;
-    const yCenter = (this.secCanvas.offsetTop + this.secCanvas.height) / 2;
-
-    this.drawCirle(xCenter, yCenter, 50, 0, 2 * Math.PI, 'fill', '#000000');
-
-    const clockSlide = (2 * Math.PI) / 240;
-    let secondPosition = 0;
-    setInterval(() => {
-      this.drawCirle(xCenter, yCenter, 45, 0, secondPosition, 'stroke', '#8BDC2C', 10);
-      secondPosition += clockSlide;
-      if (secondPosition > 2 * Math.PI) {
-        this.drawCirle(xCenter, yCenter, 50, 0, secondPosition, 'fill', '#000000', 10);
-        secondPosition = 0;
-      }
-    }, 250);
+  private createArc(innerRadius, outerRadius, startAngle, endAngle, cornerRadius) {
+    return d3.arc()
+      .innerRadius(innerRadius)
+      .outerRadius(outerRadius)
+      .startAngle(startAngle)
+      .endAngle(endAngle)
+      .cornerRadius(cornerRadius);
   }
 
-  drawCirle(x, y, radius, startAngle, endAngle, type, color, strokeWidth?) {
-    if (type === 'fill') {
-      this.ctx.beginPath();
-      this.ctx.fillStyle = color;
-      this.ctx.arc(x, y, radius, startAngle, endAngle);
-      this.ctx.fill();
-    }
-    else if (type === 'stroke') {
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = color;
-      this.ctx.lineWidth = strokeWidth;
-
-      this.ctx.arc(x, y, radius, startAngle, endAngle);
-      this.ctx.stroke();
-    }
+  private drawArc(pathContainer, arc, color) {
+    pathContainer
+      .attr('d', arc)
+      .attr('fill', color);
   }
-
 
 
 }
