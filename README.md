@@ -8,7 +8,7 @@ I have used these tools:
 
 * Angular 6.1.8
 * Angular CLI 6.2.3.
-* Node.js 9.5.9
+* Node.js 9.5.0
 * npm 5.6.0
 
 If you use different versions your could find some problems for installing it properly.
