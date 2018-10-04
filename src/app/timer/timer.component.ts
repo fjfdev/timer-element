@@ -25,6 +25,21 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.resetTimerValues();
+    this.initCircles();
+  }
+
+  ngOnDestroy() {
+    this.stopInterval();
+  }
+
+  initSvg(svgWidth: number) {
+    this.svg = d3.select('#d3-widget')
+      .append('svg')
+      .attr('width', svgWidth)
+      .attr('height', svgWidth);
+  }
+
+  initCircles() {
     const containerWidth = d3.select('#d3-widget').node().getBoundingClientRect().width;
     const svgWidth = containerWidth / 2;
 
@@ -32,10 +47,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     const circleSlice = circleMaxSize / 4;
     const circleMargin = 5;
 
-    this.svg = d3.select('#d3-widget')
-      .append('svg')
-      .attr('width', svgWidth)
-      .attr('height', svgWidth);
+    this.initSvg(svgWidth);
 
     this.backgroundCircles = [
       new TimerCircle( circleMaxSize, circleSlice, 0, 2 * this.pi, 30, '#55222C'),
@@ -46,13 +58,6 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.secondsCircle = new TimerCircle( circleMaxSize, circleSlice, 0, 0, 30, '#E91039');
     this.minutesCircle = new TimerCircle( circleMaxSize - circleSlice - circleMargin, circleSlice, 0, 0, 30, '#A0FF00');
     this.hoursCircle = new TimerCircle( circleMaxSize - circleMargin * 2 - circleSlice * 2, circleSlice, 0, 0, 30, '#19D5DE');
-  }
-
-  ngOnDestroy() {
-    this.stopInterval();
-  }
-
-  initTimer() {
 
     this.backgroundCircles.forEach( (circle: TimerCircle) => {
       circle.appendPathToSvg(this.svg);
@@ -61,7 +66,9 @@ export class TimerComponent implements OnInit, OnDestroy {
     [this.secondsCircle, this.minutesCircle, this.hoursCircle].forEach( (circle: TimerCircle) => {
       circle.appendPathToSvg(this.svg);
     });
+  }
 
+  initTimer() {
     const secSlide = (2 * this.pi) / 60;
     let secPosition = secSlide;
     const secLimit = (2 * this.pi);
