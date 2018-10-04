@@ -1,5 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { TimerCircle } from '../timerCircle.class';
 import * as d3 from 'd3';
+
 
 @Component({
   selector: 'custom-timer',
@@ -11,14 +13,39 @@ export class TimerComponent implements OnInit, OnDestroy {
   timerValue: string;
   timerInterval;
   isTimerRunning: boolean;
-  secCanvas: HTMLCanvasElement;
-  ctx;
+  pi = Math.PI;
+  svg;
+  backgroundCircles: Array<TimerCircle>;
+  secondsCircle;
+  minutesCircle;
+  hoursCircle;
 
   constructor() {
   }
 
   ngOnInit() {
     this.resetTimerValues();
+    const containerWidth = d3.select('#d3-widget').node().getBoundingClientRect().width;
+    const svgWidth = containerWidth / 2;
+
+    const circleMaxSize = (svgWidth / 2) * 0.75;
+    const circleSlice = circleMaxSize / 4;
+    const circleMargin = 5;
+
+    this.svg = d3.select('#d3-widget')
+      .append('svg')
+      .attr('width', svgWidth)
+      .attr('height', svgWidth);
+
+    this.backgroundCircles = [
+      new TimerCircle( circleMaxSize, circleSlice, 0, 2 * this.pi, 30, '#55222C'),
+      new TimerCircle( circleMaxSize - circleSlice - circleMargin, circleSlice, 0, 2 * this.pi, 30, '#435A22'),
+      new TimerCircle(circleMaxSize - circleMargin * 2 - circleSlice * 2, circleSlice, 0, 2 * this.pi, 30, '#265052'),
+    ];
+
+    this.secondsCircle = new TimerCircle( circleMaxSize, circleSlice, 0, 0, 30, '#E91039');
+    this.minutesCircle = new TimerCircle( circleMaxSize - circleSlice - circleMargin, circleSlice, 0, 0, 30, '#A0FF00');
+    this.hoursCircle = new TimerCircle( circleMaxSize - circleMargin * 2 - circleSlice * 2, circleSlice, 0, 0, 30, '#19D5DE');
   }
 
   ngOnDestroy() {
@@ -26,39 +53,26 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   initTimer() {
-    const svg = d3.select('#d3-widget')
-      .append('svg')
-      .attr('width', '400')
-      .attr('height', '400');
 
-    const secondsPath = svg
-      .append('path')
-      .attr('transform', 'translate(200,200)');
+    this.backgroundCircles.forEach( (circle: TimerCircle) => {
+      circle.appendPathToSvg(this.svg);
+    });
 
-    const minutesPath = svg
-      .append('path')
-      .attr('transform', 'translate(200,200)');
+    [this.secondsCircle, this.minutesCircle, this.hoursCircle].forEach( (circle: TimerCircle) => {
+      circle.appendPathToSvg(this.svg);
+    });
 
-    const hoursPath = svg
-      .append('path')
-      .attr('transform', 'translate(200,200)');
-
-    const pi = Math.PI;
-    const secSlide = (2 * pi) / 60;
+    const secSlide = (2 * this.pi) / 60;
     let secPosition = secSlide;
-    const secLimit = (2 * pi);
-    let fillColor = 'E91039';
-
-    let secondsArc = this.createArc(100, 130, 0, secPosition, 30);
-    let minutesArc = this.createArc(65, 95, 0, secPosition, 30);
-    let hoursArc = this.createArc(30, 60, 0, secPosition, 30);
-
-    this.drawArc(secondsPath, secondsArc, '#E91039');
-    this.drawArc(minutesPath, minutesArc, '#A0FF00');
-    this.drawArc(hoursPath, hoursArc, '#19D5DE');
+    const secLimit = (2 * this.pi);
+    let fillColor = '#E91039';
 
 
-    //
+    this.backgroundCircles.forEach( (circle: TimerCircle) => {
+      circle.updateArc(0, 2 * this.pi);
+      circle.drawArc();
+    });
+
     let secCount = 1;
     this.isTimerRunning = true;
     this.timerInterval = setInterval( () => {
@@ -78,13 +92,19 @@ export class TimerComponent implements OnInit, OnDestroy {
       secPosition = resetClockNeeded ? 0 : secPosition + secSlide;
       fillColor = resetClockNeeded ? '#000000' : '#E91039';
 
-      secondsArc = this.createArc(100, 130, 0, secSlide * seconds, 30);
-      minutesArc = this.createArc(65, 95, 0, secSlide * minutes, 30);
-      hoursArc = this.createArc(30, 60, 0, secSlide * hours, 30);
+      this.secondsCircle.updateArc(0, secSlide * seconds);
 
-      this.drawArc(secondsPath, secondsArc, fillColor);
-      this.drawArc(minutesPath, minutesArc, '#A0FF00');
-      this.drawArc(hoursPath, hoursArc, '#19D5DE');
+      this.minutesCircle.updateArc(0, secSlide * minutes);
+
+      this.hoursCircle.updateArc(0, secSlide * hours);
+
+      this.secondsCircle.drawArc();
+      this.minutesCircle.drawArc();
+      this.hoursCircle.drawArc();
+
+      // const text = svg.append('text');
+      // text.text( (d) => '1').attr('fill', 'white');
+
 
     }, 1000);
   }
@@ -98,21 +118,5 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.resetTimerValues();
     clearInterval(this.timerInterval);
   }
-
-  private createArc(innerRadius, outerRadius, startAngle, endAngle, cornerRadius) {
-    return d3.arc()
-      .innerRadius(innerRadius)
-      .outerRadius(outerRadius)
-      .startAngle(startAngle)
-      .endAngle(endAngle)
-      .cornerRadius(cornerRadius);
-  }
-
-  private drawArc(pathContainer, arc, color) {
-    pathContainer
-      .attr('d', arc)
-      .attr('fill', color);
-  }
-
 
 }
