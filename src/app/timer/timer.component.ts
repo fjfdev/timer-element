@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { TimerCircle } from '../timerCircle.class';
 import * as d3 from 'd3';
 
-
 @Component({
   selector: 'custom-timer',
   templateUrl: './timer.component.html',
@@ -11,113 +10,177 @@ import * as d3 from 'd3';
 })
 export class TimerComponent implements OnInit, OnDestroy {
   timerValue: string;
-  timerInterval;
+  timerInterval: number;
   isTimerRunning: boolean;
-  pi = Math.PI;
-  svg;
-  backgroundCircles: Array<TimerCircle>;
-  secondsCircle;
-  minutesCircle;
-  hoursCircle;
+  pi: number;
+  svg: Selection;
+  secondsCircle: TimerCircle;
+  minutesCircle: TimerCircle;
+  hoursCircle: TimerCircle;
+  graphSizes;
 
   constructor() {
+    this.pi = Math.PI;
   }
 
   ngOnInit() {
+    this.initGraphSizes();
+    this.initGraphics();
     this.resetTimerValues();
-    this.initCircles();
   }
 
   ngOnDestroy() {
     this.stopInterval();
   }
 
-  initSvg(svgWidth: number) {
-    this.svg = d3.select('#d3-widget')
-      .append('svg')
-      .attr('width', svgWidth)
-      .attr('height', svgWidth);
-  }
-
-  initCircles() {
+  initGraphSizes() {
+    const numberOfCircles = 3;
     const containerWidth = d3.select('#d3-widget').node().getBoundingClientRect().width;
     const svgWidth = containerWidth / 2;
-
     const circleMaxSize = (svgWidth / 2) * 0.75;
-    const circleSlice = circleMaxSize / 4;
+    const lineSize = circleMaxSize / (numberOfCircles + 1);
     const circleMargin = 5;
 
-    this.initSvg(svgWidth);
+    this.graphSizes = {
+      containerWidth: containerWidth,
+      svgWidth: svgWidth,
+      circleMaxSize: circleMaxSize,
+      lineSize: lineSize,
+      circleMargin : circleMargin,
+      secondsMaxRadius: circleMaxSize,
+      minutesMaxRadius: circleMaxSize - lineSize - circleMargin,
+      hoursMaxRadius: circleMaxSize - circleMargin * 2 - lineSize * 2,
+    };
+  }
 
-    this.backgroundCircles = [
-      new TimerCircle( circleMaxSize, circleSlice, 0, 2 * this.pi, 30, '#55222C'),
-      new TimerCircle( circleMaxSize - circleSlice - circleMargin, circleSlice, 0, 2 * this.pi, 30, '#435A22'),
-      new TimerCircle(circleMaxSize - circleMargin * 2 - circleSlice * 2, circleSlice, 0, 2 * this.pi, 30, '#265052'),
-    ];
+  initGraphics() {
+    this.initSvg();
+    this.initSeconds();
+    this.initMinutes();
+    this.initHours();
+  }
 
-    this.secondsCircle = new TimerCircle( circleMaxSize, circleSlice, 0, 0, 30, '#E91039');
-    this.minutesCircle = new TimerCircle( circleMaxSize - circleSlice - circleMargin, circleSlice, 0, 0, 30, '#A0FF00');
-    this.hoursCircle = new TimerCircle( circleMaxSize - circleMargin * 2 - circleSlice * 2, circleSlice, 0, 0, 30, '#19D5DE');
+  initSvg() {
+    this.svg = d3.select('#d3-widget')
+      .append('svg')
+      .attr('width', this.graphSizes.svgWidth)
+      .attr('height', this.graphSizes.svgWidth);
+  }
 
-    this.backgroundCircles.forEach( (circle: TimerCircle) => {
-      circle.appendPathToSvg(this.svg);
-    });
+  initSeconds() {
+    const background = new TimerCircle(
+      this.graphSizes.secondsMaxRadius,
+      this.graphSizes.lineSize,
+      0,
+      2 * this.pi,
+      30,
+      '#55222C',
+      this.svg);
 
-    [this.secondsCircle, this.minutesCircle, this.hoursCircle].forEach( (circle: TimerCircle) => {
-      circle.appendPathToSvg(this.svg);
-    });
+    this.secondsCircle = new TimerCircle(
+      this.graphSizes.secondsMaxRadius,
+      this.graphSizes.lineSize,
+      0,
+      0,
+      30,
+      '#E91039',
+      this.svg);
+
+    background.drawArc();
+    this.secondsCircle.drawArc();
+  }
+
+  initMinutes() {
+    const background = new TimerCircle(
+      this.graphSizes.minutesMaxRadius,
+      this.graphSizes.lineSize,
+      0,
+      2 * this.pi,
+      30,
+      '#435A22',
+      this.svg);
+
+    this.minutesCircle = new TimerCircle(
+      this.graphSizes.minutesMaxRadius,
+      this.graphSizes.lineSize,
+      0,
+      0,
+      30,
+      '#A0FF00',
+      this.svg);
+
+    background.drawArc();
+    this.minutesCircle.drawArc();
+  }
+
+  initHours() {
+    const background = new TimerCircle(
+      this.graphSizes.hoursMaxRadius,
+      this.graphSizes.lineSize,
+      0,
+      2 * this.pi,
+      30,
+      '#265052',
+      this.svg);
+
+    this.hoursCircle = new TimerCircle(
+      this.graphSizes.hoursMaxRadius,
+      this.graphSizes.lineSize,
+      0,
+      0,
+      30,
+      '#19D5DE',
+      this.svg);
+
+    background.drawArc();
+    this.hoursCircle.drawArc();
   }
 
   initTimer() {
-    const secSlide = (2 * this.pi) / 60;
-    let secPosition = secSlide;
-    const secLimit = (2 * this.pi);
-    let fillColor = '#E91039';
-
-
-    this.backgroundCircles.forEach( (circle: TimerCircle) => {
-      circle.updateArc(0, 2 * this.pi);
-      circle.drawArc();
-    });
-
     let secCount = 1;
     this.isTimerRunning = true;
     this.timerInterval = setInterval( () => {
       const seconds = secCount % 60;
       const minutes = Math.floor((secCount / 60)) % 60;
-      const hours = Math.floor(Math.floor((secCount / 60)) / 60);
+      const hours = Math.floor(Math.floor((secCount / 60)) / 60) % 12;
 
-      const secondsStr = ('0' + seconds).slice(-2);
-      const minutesStr = ('0' + minutes).slice(-2);
-      const hoursStr = ('0' + hours).slice(-2);
+      this.updateTimerValue(hours, minutes, seconds);
+      this.updateSecondsCircle(seconds);
+      this.updateMinutesCircle(minutes);
+      this.updateHoursCircle(hours);
 
-      this.timerValue = `${hoursStr}:${minutesStr}:${secondsStr}`;
       secCount += 1;
-    //
-
-      const resetClockNeeded: boolean = secPosition > secLimit;
-      secPosition = resetClockNeeded ? 0 : secPosition + secSlide;
-      fillColor = resetClockNeeded ? '#000000' : '#E91039';
-
-      this.secondsCircle.updateArc(0, secSlide * seconds);
-
-      this.minutesCircle.updateArc(0, secSlide * minutes);
-
-      this.hoursCircle.updateArc(0, secSlide * hours);
-
-      this.secondsCircle.drawArc();
-      this.minutesCircle.drawArc();
-      this.hoursCircle.drawArc();
-
-      // const text = svg.append('text');
-      // text.text( (d) => '1').attr('fill', 'white');
-
-
     }, 1000);
   }
 
+  updateSecondsCircle(secondsValue) {
+    const secSlice = (2 * this.pi) / 60;
+    this.secondsCircle.updateArc(0, secSlice * secondsValue);
+    this.secondsCircle.drawArc();
+  }
+
+  updateMinutesCircle(minutesValue) {
+    const minutesSlice = (2 * this.pi) / 60;
+    this.minutesCircle.updateArc(0, minutesSlice * minutesValue);
+    this.minutesCircle.drawArc();
+  }
+
+  updateHoursCircle(hoursValue) {
+    const hoursSlice = (2 * this.pi) / 12;
+    this.hoursCircle.updateArc(0, hoursSlice * hoursValue);
+    this.hoursCircle.drawArc();
+  }
+
+  updateTimerValue(hours, minutes, seconds) {
+    const secondsStr = ('0' + seconds).slice(-2);
+    const minutesStr = ('0' + minutes).slice(-2);
+    const hoursStr = ('0' + hours).slice(-2);
+
+    this.timerValue = `${hoursStr}:${minutesStr}:${secondsStr}`;
+  }
+
   resetTimerValues() {
-    this.timerValue = '00:00:00';
+    this.updateTimerValue(0, 0, 0);
     this.isTimerRunning = false;
   }
 

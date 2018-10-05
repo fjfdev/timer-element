@@ -8,7 +8,6 @@ export class TimerCircle {
   endAngle: number;
   cornerRadius: number;
   fillColor: string;
-  timeValue?: number;
   path?: Selection;
   arc?: Arc<any, any>;
 
@@ -18,25 +17,20 @@ export class TimerCircle {
               endAngle,
               cornerRadius,
               fillColor,
-              timeValue?,
-              path?,
-              arc?) {
+              svg) {
     this.innerRadius = circleMaxRadius - lineWidth;
     this.outerRadius = circleMaxRadius;
     this.startAngle = startAngle;
     this.endAngle = endAngle;
     this.cornerRadius = cornerRadius;
     this.fillColor = fillColor;
-    this.timeValue = timeValue ? timeValue : 0;
-    this.path = path ? path : null;
-    this.arc = arc ? arc : null;
+    this.appendPathToSvg(svg);
+    this.updateArc(startAngle, endAngle);
   }
 
   appendPathToSvg(svg) {
     const centerX = svg.node().getBoundingClientRect().width / 2;
     const centerY = svg.node().getBoundingClientRect().height / 2;
-
-    console.log(centerX, centerY);
     this.path = svg.append('path').attr('transform', `translate(${centerX}, ${centerY})`);
   }
 
@@ -52,7 +46,6 @@ export class TimerCircle {
       .startAngle(this.startAngle)
       .endAngle(this.endAngle)
       .cornerRadius(this.cornerRadius);
-
   }
 
   drawArc() {
