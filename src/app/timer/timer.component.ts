@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { TimerCircle } from '../timerCircle.class';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -10,7 +10,7 @@ import * as d3 from 'd3';
 })
 export class TimerComponent implements OnInit, OnDestroy {
   timerValue: string;
-  timerInterval: number;
+  timerInterval;
   isTimerRunning: boolean;
   pi: number;
   svg: Selection;
