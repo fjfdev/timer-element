@@ -1,5 +1,5 @@
 import { TimerCircle } from '../timerCircle.class';
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -9,6 +9,8 @@ import * as d3 from 'd3';
   encapsulation: ViewEncapsulation.Emulated
 })
 export class TimerComponent implements OnInit, OnDestroy {
+  @Output() timerValueUpdated = new EventEmitter<string>();
+
   timerValue: string;
   timerInterval;
   isTimerRunning: boolean;
@@ -148,6 +150,8 @@ export class TimerComponent implements OnInit, OnDestroy {
       this.updateSecondsCircle(seconds);
       this.updateMinutesCircle(minutes);
       this.updateHoursCircle(hours);
+
+      this.timerValueUpdated.emit(this.timerValue);
 
       secCount += 1;
     }, 1000);
