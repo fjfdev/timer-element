@@ -1,11 +1,12 @@
-<div class="timer-container">
-  <div class="timer-value">{{ timerValue }}</div>
-  <div class="timer-actions">
-    <button class="start" (click)="initTimer()" *ngIf="!isTimerRunning">
-      Start
-    </button>
-    <button class="stop"(click)="stopInterval()" *ngIf="isTimerRunning">
-      Stop
-    </button>
+<div class="timer">
+  <div id="d3-container">
+    <div class="timer-actions">
+      <button class="start" (click)="initTimer()" *ngIf="!isTimerRunning">
+        Start
+      </button>
+      <button class="stop"(click)="stopInterval()" *ngIf="isTimerRunning">
+        Stop
+      </button>
+    </div>
   </div>
 </div>

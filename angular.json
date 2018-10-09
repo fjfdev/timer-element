@@ -19,19 +19,12 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
             ],
             "styles": [
               "src/styles.css"
             ],
             "scripts": [
-              {
-                "input": "node_modules/document-register-element/build/document-register-element.js"
-              },
-              {
-                "input": "node_modules/document-register-element/build/document-register-element.js"
-              }
+
             ]
           },
           "configurations": {
@@ -83,8 +76,6 @@
             ],
             "scripts": [],
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
             ]
           }
         },
