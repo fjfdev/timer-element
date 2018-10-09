@@ -37,7 +37,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   initGraphSizes() {
     const numberOfCircles = 3;
-    const containerWidth = d3.select('#d3-widget').node().getBoundingClientRect().width;
+    const containerWidth = d3.select('#d3-container').node().getBoundingClientRect().width;
     const svgWidth = containerWidth / 2;
     const circleMaxSize = (svgWidth / 2) * 0.75;
     const lineSize = circleMaxSize / (numberOfCircles + 1);
@@ -63,7 +63,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   initSvg() {
-    this.svg = d3.select('#d3-widget')
+    this.svg = d3.select('#d3-container')
       .append('svg')
       .attr('width', this.graphSizes.svgWidth)
       .attr('height', this.graphSizes.svgWidth);

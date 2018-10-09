@@ -1,24 +1,8 @@
-.timer-container {
+.timer {
   width: 100%;
   display: inline-block;
-  
-  @media(max-width: 300px) {
-    text-align: center;
-  }
-
-  .timer-value {
-    float: left;
-    font-family: "DigitalClock";
-    font-size: 40px;
-
-    @media(max-width: 300px) {
-      float: none;
-    }
-  }
 
   .timer-actions {
-    float: right;
-    margin-top: 11px;
 
     @media(max-width: 300px) {
       float: none;
@@ -29,22 +13,30 @@
     }
 
     button {
-      background-color: transparent;
-      box-shadow: 0px 3px 10px black;
+      border: 2px solid black;
       border-radius: 5px;
       cursor: pointer;
       width: 65px;
       height: 32px;
+
+      &.start {
+        background-color: #81cd00;
+      }
+
+      &.stop {
+        background-color: #bf0c2e;
+      }
     }
 
   }
 }
 
-.timer-widgets {
+.timer {
   width: 100%;
 
-  #d3-widget {
+  #d3-container {
     width: 100%;
+    padding-top: 20px;
     background-color: black;
     text-align: center;
   }
