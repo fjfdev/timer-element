@@ -1,11 +1,8 @@
 <div class="timer">
   <div id="d3-container">
     <div class="timer-actions">
-      <button class="start" (click)="initTimer()" *ngIf="!isTimerRunning">
-        Start
-      </button>
-      <button class="stop"(click)="stopInterval()" *ngIf="isTimerRunning">
-        Stop
+      <button class="start" (click)="manageButtonClick()">
+        <span class="timer-label"></span>
       </button>
     </div>
   </div>

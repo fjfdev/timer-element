@@ -11,9 +11,22 @@ import * as d3 from 'd3';
 export class TimerComponent implements OnInit, OnDestroy {
   @Output() timerValueUpdated = new EventEmitter<string>();
 
+  _isTimerRunning: boolean;
+  get isTimerRunning() {
+    return this._isTimerRunning;
+  }
+
+  set isTimerRunning(value: boolean) {
+    this._isTimerRunning = value;
+    const htmlElement = document.querySelector('.timer-label');
+    if (htmlElement) {
+      htmlElement.textContent = this.isTimerRunning ? 'Stop' : 'Start';
+      htmlElement.parentElement.className = this.isTimerRunning ? 'stop' : 'start';
+    }
+  }
+
   timerValue: string;
   timerInterval;
-  isTimerRunning: boolean;
   pi: number;
   svg: Selection;
   secondsCircle: TimerCircle;
@@ -23,6 +36,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.pi = Math.PI;
+    this.isTimerRunning = false;
   }
 
   ngOnInit() {
@@ -138,10 +152,20 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.hoursCircle.drawArc();
   }
 
+  manageButtonClick() {
+    if (this.isTimerRunning) {
+      this.stopInterval();
+    }
+    else {
+      this.initTimer();
+    }
+  }
+
   initTimer() {
     let secCount = 1;
     this.isTimerRunning = true;
-    this.timerInterval = setInterval( () => {
+
+    function updateTimer() {
       const seconds = secCount % 60;
       const minutes = Math.floor((secCount / 60)) % 60;
       const hours = Math.floor(Math.floor((secCount / 60)) / 60) % 12;
@@ -154,7 +178,9 @@ export class TimerComponent implements OnInit, OnDestroy {
       this.timerValueUpdated.emit(this.timerValue);
 
       secCount += 1;
-    }, 1000);
+    }
+
+    this.timerInterval = setInterval( updateTimer.bind(this), 1000);
   }
 
   updateSecondsCircle(secondsValue) {
