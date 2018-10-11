@@ -40,6 +40,12 @@
 /** IE10 and IE11 requires the following for the Reflect API. */
 // import 'core-js/es6/reflect';
 
+// Specific polyfills for custom elements
+import '@webcomponents/custom-elements/src/native-shim';
+import '@webcomponents/custom-elements/custom-elements.min';
+import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter';
+import '@webcomponents/webcomponentsjs/webcomponents-bundle';
+import '@webcomponents/webcomponentsjs/webcomponents-loader';
 
 /** Evergreen browsers require these. **/
 // Used for reflect-metadata in JIT. If you use AOT (and only Angular decorators), you can remove.
@@ -71,12 +77,10 @@ import 'core-js/es7/reflect';
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js/dist/zone';  // Included with Angular CLI.
+// import 'zone.js/dist/zone';  // Included with Angular CLI.
 
 
 
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
-import '@webcomponents/custom-elements/src/native-shim';
-import '@webcomponents/custom-elements/custom-elements.min';
