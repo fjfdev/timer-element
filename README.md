@@ -38,3 +38,7 @@ htmlElement.addEventListener('timerValueUpdated', (data) => {
   // data.detail contains the timer value 
 });
 ```
+
+## Use cases
+* :orange_book: [Plain HTML and JS](https://timer-html.firebaseapp.com)
+* :green_book: [Vue.js](https://timer-vue.firebaseapp.com)
